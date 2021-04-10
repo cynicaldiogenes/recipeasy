@@ -1,5 +1,12 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    {% if title %}
+    <title>{{ title }} - Recipeasy!</title>
+    {% else %}
+    <title>Recipeasy!</title>
+    {% endif %}
+  </head>
   <body>
     {% block content %}
     {% endblock %}
