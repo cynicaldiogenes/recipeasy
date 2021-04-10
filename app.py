@@ -10,7 +10,7 @@ db = SQLAlchemy(app)
 
 
 #create login manager later
-login_manager = LoginManager()
-login_manager.init_app(app)
+#login_manager = LoginManager()
+#login_manager.init_app(app)
 import routes
 #import models later
