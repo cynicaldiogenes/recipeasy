@@ -17,6 +17,8 @@ class User(UserMixin, db.Model):
   password_hash = db.Column(db.String(128))
   created = db.Column(db.DateTime(), default=datetime.utcnow)
   recipes = db.relationship('Recipe', backref='author', lazy='dynamic')
+  about_me = db.Column(db.String(140))
+  last_seen = db.Column(db.DateTime, default=datetime.utcnow)
   
   def avatar(self, size):
     digest = md5(self.email.lower().encode('utf-8')).hexdigest()
