@@ -34,11 +34,21 @@ class User(UserMixin, db.Model):
     return check_password_hash(self.password_hash, password)
 
 #recipe-ingredient association table
-recipe_ingredient = db.Table('recipe_ingredient',
-  db.Column('recipe_id', db.Integer, db.ForeignKey('recipe.id'), primary_key=True),
-  db.Column('ingredient_id', db.Integer, db.ForeignKey('ingredient.id'), primary_key=True),
-  db.Column('quantity', db.Integer)
-)
+#recipe_ingredient = db.Table(
+#  'recipe_ingredient',
+#  db.Column('ingredient_id', db.Integer, db.ForeignKey('ingredient.id')),
+#  db.Column('recipe_id', db.Integer, db.ForeignKey('recipe.id')),
+#  db.Column('quantity', db.Integer)
+#)
+
+#recipe-ingredient association table via model
+class RecipeIngredient(db.Model):
+  #__tablename__= "recipe_ingredient"
+  recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), primary_key=True)
+  ingredient_id = db.Column(db.Integer, db.ForeignKey('ingredient.id'), primary_key=True)
+  quantity = db.Column(db.Float)
+  recipe = db.relationship('Recipe', back_populates='ingredients')
+  ingredient = db.relationship('Ingredient', back_populates='recipes')
 
 #Recipes model
 class Recipe(db.Model):
@@ -49,12 +59,7 @@ class Recipe(db.Model):
   tags = db.Column(db.String(128), index=True, unique=False)
   user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
   created = db.Column(db.DateTime(), default=datetime.utcnow)
-  ingredients = db.relationship(
-    'Ingredient',
-    secondary=recipe_ingredient,
-    lazy='subquery',
-    backref=db.backref('ingredients', lazy=True)
-    )
+  ingredients = db.relationship('RecipeIngredient', back_populates='recipe')
 
   def __repr__(self):
     return f'Recipe {self.name}'
@@ -67,8 +72,7 @@ class Ingredient(db.Model):
   unit_type = db.Column(db.String(64), unique=False)
   notes = db.Column(db.String(1024), nullable=True, unique=False)
   created = db.Column(db.DateTime(), default=datetime.utcnow)
-  #Commented out the following line because I could only get this working via backref instad of back_populates
-  #recipes = db.relationship('Recipe', secondary=recipe_ingredient, back_populates='recipes')
+  recipes = db.relationship('RecipeIngredient', back_populates='ingredient')
 
   def __repr__(self):
     return f'Ingredient {self.name}'
