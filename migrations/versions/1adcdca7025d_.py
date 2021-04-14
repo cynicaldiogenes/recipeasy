@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: b07c82070c44
+Revision ID: 1adcdca7025d
 Revises: 
-Create Date: 2021-04-12 15:13:19.795599
+Create Date: 2021-04-14 11:59:27.717971
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'b07c82070c44'
+revision = '1adcdca7025d'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -34,6 +34,8 @@ def upgrade():
     sa.Column('email', sa.String(length=120), nullable=False),
     sa.Column('password_hash', sa.String(length=128), nullable=True),
     sa.Column('created', sa.DateTime(), nullable=True),
+    sa.Column('about_me', sa.String(length=140), nullable=True),
+    sa.Column('last_seen', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_user_email'), 'user', ['email'], unique=True)
@@ -54,7 +56,7 @@ def upgrade():
     op.create_table('recipe_ingredient',
     sa.Column('recipe_id', sa.Integer(), nullable=False),
     sa.Column('ingredient_id', sa.Integer(), nullable=False),
-    sa.Column('quantity', sa.Integer(), nullable=True),
+    sa.Column('quantity', sa.Float(), nullable=True),
     sa.ForeignKeyConstraint(['ingredient_id'], ['ingredient.id'], ),
     sa.ForeignKeyConstraint(['recipe_id'], ['recipe.id'], ),
     sa.PrimaryKeyConstraint('recipe_id', 'ingredient_id')

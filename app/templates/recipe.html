@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>{{ recipe.name }}</h1>
+  <h3>Instructions</h3>
+  <p>{{ recipe.instructions }}</p>
+  <h3>Ingredients</h3>
+  {% for ingredient in ingredients %}
+    {% include '_ingredient_summary.html' %}
+  {% endfor %}
+{% endblock %}

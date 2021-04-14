@@ -2,7 +2,7 @@ from app import app, db
 from datetime import datetime
 from flask import request, render_template, flash, redirect, url_for
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User#, Recipes, Ingredients, RecipeIngredients, Ratings
+from app.models import User, Recipe, Ingredient, RecipeIngredient
 from app.forms import LoginForm, RegisterForm, IngredientForm, RecipeForm, RecipeIngredientForm, EditProfileForm
 from werkzeug.urls import url_parse
 
@@ -58,10 +58,7 @@ def register():
 @login_required
 def user(username):
   user = User.query.filter_by(username=username).first_or_404()
-  recipes = [
-    {'author': user, 'name': 'test recipe #1'},
-    {'author': user, 'name': 'test recipe #2'}
-  ]
+  recipes = Recipe.query.filter_by(user_id=user.id).all()
   return render_template('user.html', user=user, recipes=recipes)
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
@@ -77,3 +74,12 @@ def edit_profile():
     form.username.data = current_user.username
     form.about_me.data = current_user.about_me
   return render_template('edit_profile.html', title='Edit Profile', form=form)
+
+@app.route('/recipe/<recipename>', methods=['GET', 'POST'])
+def recipe(recipename):
+  recipe = Recipe.query.filter_by(name=recipename).first_or_404()
+  ingredients = {}
+  for ingredient in recipe.ingredients:
+    i = Ingredient.query.filter_by(id=ingredient.ingredient_id).first()
+    ingredients[i.name] = ingredient.quantity
+  return render_template('recipe.html', recipe=recipe, ingredients=ingredients, title=recipename)
