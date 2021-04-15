@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import request, render_template, flash, redirect, url_for
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Recipe, Ingredient, RecipeIngredient
-from app.forms import LoginForm, RegisterForm, IngredientForm, RecipeForm, RecipeIngredientForm, EditProfileForm
+from app.forms import LoginForm, RegisterForm, IngredientForm, RecipeForm, RecipeIngredientForm, EditProfileForm, EmptyForm
 from werkzeug.urls import url_parse
 
 @app.before_request
@@ -84,3 +84,50 @@ def recipe(recipename):
     i = Ingredient.query.filter_by(id=ingredient.ingredient_id).first()
     ingredients[i.name] = ingredient.quantity
   return render_template('recipe.html', recipe=recipe, ingredients=ingredients, title=recipename)
+
+@app.route('/edit_recipe/<recipename>', methods=['GET', 'POST'])
+@login_required
+def edit_recipe(recipename):
+  form = EditRecipeForm()
+  recipe = Recipe.query.filter_by(name=recipename).first_or_404()
+  if form.validate_on_submit():
+    recipe.name = form.name.data
+    recipe.instructions = form.instructions.data
+
+@app.route('/add_recipe_ingredient/<recipe>/<ingredient>', methods=['POST'])
+@login_required
+def add_recipe_ingredient(recipe, ingredient):
+  form = EmptyForm()
+  if form.validate_on_submit():
+    myrecipe = Recipe.query.filter_by(name=recipe).first()
+    if myrecipe is None:
+      flash(f'Recipe {recipe} not found.')
+      return redirect(url_for('index'))
+    myingredient = Ingredient.filter_by(name=ingredient).first()
+    if myingredient is None:
+      flash(f'Ingredient {ingredient} not found.')
+    myrecipe.add_ingredient(myingredient)
+    db.session.commit()
+    flash(f'Added {ingredient} to {recipe}')
+    return redirect(url_for('index'))
+  else:
+    return redirect(url_for('index'))
+
+@app.route('/remove_recipe_ingredient/<recipe>/<ingredient>', methods=['POST'])
+@login_required
+def remove_recipe_ingredient(recipe, ingredient):
+  form = EmptyForm()
+  if form.validate_on_submit():
+    myrecipe = Recipe.query.filter_by(name=recipe).first()
+    if myrecipe is None:
+      flash(f'Recipe {recipe} not found.')
+      return redirect(url_for('index'))
+    myingredient = Ingredient.filter_by(name=ingredient).first()
+    if myingredient is None:
+      flash(f'Ingredient {ingredient} not found.')
+    myrecipe.remove_ingredient(myingredient)
+    db.session.commit()
+    flash(f'Removed {ingredient} from {recipe}.')
+    return redirect(url_for('index'))
+  else:
+    return redirect(url_for('index'))

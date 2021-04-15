@@ -42,8 +42,7 @@ class EditProfileForm(FlaskForm):
       user = User.query.filter_by(username=self.username.data).first()
       if user is not None:
         print("There should be a validation error here")
-        raise ValidationError('Please choose a different username.')
-        
+        raise ValidationError('Please choose a different username.')  
 
 class IngredientForm(FlaskForm):
   name = StringField('Ingredient Name', validators=[DataRequired()]),
@@ -67,4 +66,7 @@ class RecipeIngredientForm(FlaskForm):
   def __init__(self, *args, **kwargs):
     super(RecipeIngredientForm, self).__init__(*args, **kwargs)
     self.recipe_ingredients.choices = [ 
-      (ingredient.id, ingredient.name) for ingrdient in Ingredient.query.order_by(Ingredient.name)]
+      (ingredient.id, ingredient.name) for ingredient in Ingredient.query.order_by(Ingredient.name)]
+
+class EmptyForm(FlaskForm):
+  submit = SubmitField('Submit')
