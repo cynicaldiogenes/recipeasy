@@ -75,7 +75,8 @@ def edit_profile():
     form.about_me.data = current_user.about_me
   return render_template('edit_profile.html', title='Edit Profile', form=form)
 
-@app.route('/recipe/<recipename>', methods=['GET', 'POST'])
+# Redo this to improve the queries
+@app.route('/recipe/<recipename>')
 def recipe(recipename):
   recipe = Recipe.query.filter_by(name=recipename).first_or_404()
   ingredients = {}

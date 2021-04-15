@@ -33,17 +33,8 @@ class User(UserMixin, db.Model):
   def check_password(self, password):
     return check_password_hash(self.password_hash, password)
 
-#recipe-ingredient association table
-#recipe_ingredient = db.Table(
-#  'recipe_ingredient',
-#  db.Column('ingredient_id', db.Integer, db.ForeignKey('ingredient.id')),
-#  db.Column('recipe_id', db.Integer, db.ForeignKey('recipe.id')),
-#  db.Column('quantity', db.Integer)
-#)
-
 #recipe-ingredient association table via model
 class RecipeIngredient(db.Model):
-  #__tablename__= "recipe_ingredient"
   recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), primary_key=True)
   ingredient_id = db.Column(db.Integer, db.ForeignKey('ingredient.id'), primary_key=True)
   quantity = db.Column(db.Float)
@@ -59,10 +50,27 @@ class Recipe(db.Model):
   tags = db.Column(db.String(128), index=True, unique=False)
   user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
   created = db.Column(db.DateTime(), default=datetime.utcnow)
-  ingredients = db.relationship('RecipeIngredient', back_populates='recipe')
+  ingredients = db.relationship('RecipeIngredient', back_populates='recipe', cascade="save-update, merge, delete, delete-orphan")
 
   def __repr__(self):
     return f'Recipe {self.name}'
+  
+  def add_ingredient(self, ingredient, quantity=1):
+    if not self.is_ingredient(ingredient):
+      self.ingredients.append(
+        RecipeIngredient(recipe_id=self.id, ingredient_id=ingredient.id, quantity=quantity))
+
+  def remove_ingredient(self, ingredient):
+    if self.is_ingredient(ingredient):
+      self.ingredients.remove(RecipeIngredient.query.filter(
+        RecipeIngredient.ingredient_id == ingredient.id,
+        RecipeIngredient.recipe_id == self.id).first())
+
+  def is_ingredient(self, ingredient):
+    if RecipeIngredient.query.filter(
+      RecipeIngredient.ingredient_id == ingredient.id, 
+      RecipeIngredient.recipe_id == self.id).first():
+      return True
 
 #Ingredients model
 class Ingredient(db.Model):
@@ -76,5 +84,3 @@ class Ingredient(db.Model):
 
   def __repr__(self):
     return f'Ingredient {self.name}'
-
-#Todo: ratings model
