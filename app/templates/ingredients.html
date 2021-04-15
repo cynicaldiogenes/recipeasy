@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Ingredients</h1>
+  <table>
+    {% for ingredient in ingredients %}
+    <tr><td>{% include '_ingredient_summary.html' %}</td></tr>
+    {% endfor %}
+  </table>
+{% endblock %}
