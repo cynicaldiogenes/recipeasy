@@ -75,6 +75,16 @@ def edit_profile():
     form.about_me.data = current_user.about_me
   return render_template('edit_profile.html', title='Edit Profile', form=form)
 
+@app.route('/recipes')
+def recipes():
+  recipes = Recipe.query.all()
+  return render_template('recipes.html', title='Recipes', recipes=recipes)
+
+@app.route('/ingredients')
+def ingredients():
+  ingredients = Ingredient.query.all()
+  return render_template('ingredients.html', title="Ingredients", ingredients=ingredients)
+
 # Redo this to improve the queries
 @app.route('/recipe/<recipename>')
 def recipe(recipename):
@@ -84,6 +94,11 @@ def recipe(recipename):
     i = Ingredient.query.filter_by(id=ingredient.ingredient_id).first()
     ingredients[i.name] = ingredient.quantity
   return render_template('recipe.html', recipe=recipe, ingredients=ingredients, title=recipename)
+
+@app.route('/ingredient/<ingredientname>', methods=['GET', 'POST'])
+def ingredient(ingredientname):
+  ingredient = Ingredient.query.filter_by(name=ingredientname).first_or_404()
+  return render_template('ingredient.html', title=f'{ingredientname} details', ingredient=ingredient)
 
 @app.route('/edit_recipe/<recipename>', methods=['GET', 'POST'])
 @login_required

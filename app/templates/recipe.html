@@ -4,7 +4,13 @@
   <h3>Instructions</h3>
   <p>{{ recipe.instructions }}</p>
   <h3>Ingredients</h3>
-  {% for ingredient in ingredients %}
-    {% include '_ingredient_summary.html' %}
-  {% endfor %}
+  <table>
+    {% for ingredient in recipe.ingredients %}
+      <tr>
+        <td>{{ ingredient.ingredient.name }}</td>
+        <td>{{ ingredient.quantity }} {{ ingredient.ingredient.unit_type }}</td>
+        <td>({{ ingredient.ingredient.calories_per * ingredient.quantity }} calories)</td>
+      </tr>
+    {% endfor %}
+  </table>
 {% endblock %}

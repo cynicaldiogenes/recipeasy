@@ -10,6 +10,8 @@
   <body>
     <div>
       <a href="{{ url_for('index') }}">Home</a>
+      <a href="{{ url_for('recipes') }}">Recipes</a>
+      <a href="{{ url_for('ingredients') }}">Ingredients</a>
       {% if current_user.is_anonymous %}
       <a href="{{ url_for('login') }}">Sign In</a>
       {% else %}
