@@ -12,5 +12,6 @@
         <td>({{ ingredient.ingredient.calories_per * ingredient.quantity }} calories)</td>
       </tr>
     {% endfor %}
+      <tr><td>Total calories: {{ recipe.calories }}</td></tr>
   </table>
 {% endblock %}

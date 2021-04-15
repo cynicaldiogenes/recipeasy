@@ -51,20 +51,24 @@ class Recipe(db.Model):
   user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
   created = db.Column(db.DateTime(), default=datetime.utcnow)
   ingredients = db.relationship('RecipeIngredient', back_populates='recipe', cascade="save-update, merge, delete, delete-orphan")
+  calories = db.Column(db.Float)
 
   def __repr__(self):
     return f'Recipe {self.name}'
   
   def add_ingredient(self, ingredient, quantity=1):
     if not self.is_ingredient(ingredient):
-      self.ingredients.append(
-        RecipeIngredient(recipe_id=self.id, ingredient_id=ingredient.id, quantity=quantity))
+      recipe_ingredient = RecipeIngredient(recipe_id=self.id, ingredient_id=ingredient.id, quantity=quantity)
+      self.ingredients.append(recipe_ingredient)
+      self.calories += ingredient.calories_per * quantity
 
   def remove_ingredient(self, ingredient):
     if self.is_ingredient(ingredient):
-      self.ingredients.remove(RecipeIngredient.query.filter(
+      recipe_ingredient = RecipeIngredient.query.filter(
         RecipeIngredient.ingredient_id == ingredient.id,
-        RecipeIngredient.recipe_id == self.id).first())
+        RecipeIngredient.recipe_id == self.id).first()
+      self.ingredients.remove(recipe_ingredient)
+      self.calories -= ingredient.calories_per * recipe_ingredient.quantity
 
   def is_ingredient(self, ingredient):
     if RecipeIngredient.query.filter(
