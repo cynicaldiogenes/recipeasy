@@ -1,8 +1,10 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, TextAreaField, SelectMultipleField
+from wtforms import StringField, PasswordField, \
+  BooleanField, SubmitField, IntegerField, TextAreaField, \
+  SelectMultipleField
 from wtforms.fields.html5 import URLField, EmailField
 from wtforms.validators import DataRequired, EqualTo, Email, ValidationError, Length
-from app.models import User
+from app.models import User, Recipe
 
 class LoginForm(FlaskForm):
   username = StringField('Username', validators=[DataRequired()])
@@ -41,7 +43,6 @@ class EditProfileForm(FlaskForm):
     if username.data != self.original_username:
       user = User.query.filter_by(username=self.username.data).first()
       if user is not None:
-        print("There should be a validation error here")
         raise ValidationError('Please choose a different username.')  
 
 class IngredientForm(FlaskForm):
@@ -51,11 +52,22 @@ class IngredientForm(FlaskForm):
   notes = StringField('Notes')
   submit = SubmitField('Add Ingredient')
 
-class RecipeForm(FlaskForm):
-  name = StringField('Recipe Name', validators=[DataRequired()]),
-  instructions = TextAreaField('Instructions', validators=[DataRequired()]),
+class EditRecipeForm(FlaskForm):
+  name = StringField('Recipe Name', validators=[DataRequired()])
+  instructions = TextAreaField('Instructions', validators=[DataRequired()])
   source = URLField('Source')
+  tags = TextAreaField('Tags')
   submit = SubmitField('Add Recipe')
+
+  def __init__(self, recipename, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.original_name = recipename
+  
+  def validate_name(self, name):
+    if name.data != self.original_name:
+      check_existing_recipe = Recipe.query.filter_by(name=self.name.data).first()
+      if check_existing_recipe is not None:
+        raise ValidationError(f'A recipe witht this name already exists.')
 
 class RecipeIngredientForm(FlaskForm):
   recipe_ingredients = SelectMultipleField('Ingredients', validators=[DataRequired()])
@@ -70,3 +82,4 @@ class RecipeIngredientForm(FlaskForm):
 
 class EmptyForm(FlaskForm):
   submit = SubmitField('Submit')
+

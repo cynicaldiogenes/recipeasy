@@ -3,7 +3,8 @@ from datetime import datetime
 from flask import request, render_template, flash, redirect, url_for
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Recipe, Ingredient, RecipeIngredient
-from app.forms import LoginForm, RegisterForm, IngredientForm, RecipeForm, RecipeIngredientForm, EditProfileForm, EmptyForm
+from app.forms import LoginForm, RegisterForm, IngredientForm, \
+  EditRecipeForm, RecipeIngredientForm, EditProfileForm, EmptyForm
 from werkzeug.urls import url_parse
 
 @app.before_request
@@ -65,6 +66,8 @@ def user(username):
 @login_required
 def edit_profile():
   form = EditProfileForm(current_user.username)
+  print(current_user.username)
+  print(type(current_user.username))
   if form.validate_on_submit():
     current_user.username = form.username.data
     current_user.about_me = form.about_me.data
@@ -85,31 +88,38 @@ def ingredients():
   ingredients = Ingredient.query.all()
   return render_template('ingredients.html', title="Ingredients", ingredients=ingredients)
 
-# Redo this to improve the queries
-@app.route('/recipe/<recipename>')
+@app.route('/recipes/<recipename>')
 def recipe(recipename):
   recipe = Recipe.query.filter_by(name=recipename).first_or_404()
-  ingredients = {}
-  for ingredient in recipe.ingredients:
-    i = Ingredient.query.filter_by(id=ingredient.ingredient_id).first()
-    ingredients[i.name] = ingredient.quantity
   return render_template('recipe.html', recipe=recipe, ingredients=ingredients, title=recipename)
 
-@app.route('/ingredient/<ingredientname>', methods=['GET', 'POST'])
+@app.route('/ingredients/<ingredientname>', methods=['GET', 'POST'])
 def ingredient(ingredientname):
   ingredient = Ingredient.query.filter_by(name=ingredientname).first_or_404()
   return render_template('ingredient.html', title=f'{ingredientname} details', ingredient=ingredient)
 
-@app.route('/edit_recipe/<recipename>', methods=['GET', 'POST'])
+@app.route('/recipes/<recipename>/edit_recipe', methods=['GET', 'POST'])
 @login_required
 def edit_recipe(recipename):
-  form = EditRecipeForm()
   recipe = Recipe.query.filter_by(name=recipename).first_or_404()
+  form = EditRecipeForm(recipename)
   if form.validate_on_submit():
     recipe.name = form.name.data
     recipe.instructions = form.instructions.data
+    recipe.source = form.source.data
+    recipe.tags = form.tags.data
+    db.session.commit()
+    flash(f'{{ recipe.name }} updated.')
+  elif request.method == 'GET':
+    form.name.data = recipe.name
+    form.instructions.data = recipe.instructions
+    form.source.data = recipe.source
+    form.tags.data = recipe.tags
+  return render_template('edit_recipe.html', title=f'Edit {{ recipe.name }}', recipe=recipe, form=form)
+    
 
-@app.route('/add_recipe_ingredient/<recipe>/<ingredient>', methods=['POST'])
+#Update this route to also set quantity when adding to recipe
+@app.route('/recipes/<recipe>/add_recipe_ingredient/<ingredient>', methods=['POST'])
 @login_required
 def add_recipe_ingredient(recipe, ingredient):
   form = EmptyForm()
@@ -128,7 +138,7 @@ def add_recipe_ingredient(recipe, ingredient):
   else:
     return redirect(url_for('index'))
 
-@app.route('/remove_recipe_ingredient/<recipe>/<ingredient>', methods=['POST'])
+@app.route('/recipes/<recipe>/remove_recipe_ingredient/<ingredient>', methods=['POST'])
 @login_required
 def remove_recipe_ingredient(recipe, ingredient):
   form = EmptyForm()

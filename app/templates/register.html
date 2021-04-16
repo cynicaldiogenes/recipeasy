@@ -27,6 +27,9 @@
     </p>
     <p>{{ form.password_confirm.label }}<br>
        {{ form.password_confirm(size=64) }}<br>
+       {% for error in form.password_confirm.errors %}
+       <span style="color: red;">[{{ error }}]</span>
+       {% endfor %}
     </p>
     <p>{{ form.submit }}</p>
   </form>

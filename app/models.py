@@ -51,7 +51,7 @@ class Recipe(db.Model):
   user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
   created = db.Column(db.DateTime(), default=datetime.utcnow)
   ingredients = db.relationship('RecipeIngredient', back_populates='recipe', cascade="save-update, merge, delete, delete-orphan")
-  calories = db.Column(db.Float)
+  calories = db.Column(db.Float, default=0)
 
   def __repr__(self):
     return f'Recipe {self.name}'
