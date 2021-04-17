@@ -46,9 +46,9 @@ class EditProfileForm(FlaskForm):
         raise ValidationError('Please choose a different username.')  
 
 class IngredientForm(FlaskForm):
-  name = StringField('Ingredient Name', validators=[DataRequired()]),
-  calories_per = IntegerField('Calories per', validators=[DataRequired()]),
-  unit_type = StringField('Measurement unit', validators=[DataRequired()]),
+  name = StringField('Ingredient Name', validators=[DataRequired()])
+  calories_per = IntegerField('Calories per', validators=[DataRequired()])
+  unit_type = StringField('Measurement unit', validators=[DataRequired()])
   notes = StringField('Notes')
   submit = SubmitField('Add Ingredient')
 
@@ -57,7 +57,7 @@ class EditRecipeForm(FlaskForm):
   instructions = TextAreaField('Instructions', validators=[DataRequired()])
   source = URLField('Source')
   tags = TextAreaField('Tags')
-  submit = SubmitField('Add Recipe')
+  submit = SubmitField('Save Changes')
 
   def __init__(self, recipename, *args, **kwargs):
     super().__init__(*args, **kwargs)

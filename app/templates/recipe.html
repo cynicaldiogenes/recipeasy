@@ -14,4 +14,5 @@
     {% endfor %}
       <tr><td>Total calories: {{ recipe.calories }}</td></tr>
   </table>
+  <h3><a href="{{ url_for('edit_recipe', recipename=recipe.name) }}">Edit Recipe</a></h3>
 {% endblock %}
