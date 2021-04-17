@@ -3,7 +3,8 @@ from wtforms import StringField, PasswordField, \
   BooleanField, SubmitField, IntegerField, TextAreaField, \
   SelectMultipleField
 from wtforms.fields.html5 import URLField, EmailField
-from wtforms.validators import DataRequired, EqualTo, Email, ValidationError, Length
+from wtforms.validators import DataRequired, EqualTo, \
+  Email, ValidationError, Length, InputRequired
 from app.models import User, Recipe
 
 class LoginForm(FlaskForm):
@@ -47,7 +48,7 @@ class EditProfileForm(FlaskForm):
 
 class IngredientForm(FlaskForm):
   name = StringField('Ingredient Name', validators=[DataRequired()])
-  calories_per = IntegerField('Calories per', validators=[DataRequired()])
+  calories_per = IntegerField('Calories per', validators=[InputRequired()])
   unit_type = StringField('Measurement unit', validators=[DataRequired()])
   notes = StringField('Notes')
   submit = SubmitField('Add Ingredient')
@@ -82,4 +83,3 @@ class RecipeIngredientForm(FlaskForm):
 
 class EmptyForm(FlaskForm):
   submit = SubmitField('Submit')
-

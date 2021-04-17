@@ -66,8 +66,6 @@ def user(username):
 @login_required
 def edit_profile():
   form = EditProfileForm(current_user.username)
-  print(current_user.username)
-  print(type(current_user.username))
   if form.validate_on_submit():
     current_user.username = form.username.data
     current_user.about_me = form.about_me.data
@@ -156,3 +154,40 @@ def remove_recipe_ingredient(recipe, ingredient):
     return redirect(url_for('index'))
   else:
     return redirect(url_for('index'))
+
+@app.route('/ingredients/add_ingredient', methods=['GET', 'POST'])
+@login_required
+def add_ingredient():
+  form = IngredientForm()
+  if form.validate_on_submit():
+    ingredient = Ingredient(
+      name = form.name.data,
+      calories_per = form.calories_per.data,
+      unit_type = form.unit_type.data,
+      notes = form.notes.data
+    )
+    db.session.add(ingredient)
+    db.session.commit()
+    flash(f'Added {ingredient.name}!')
+    return redirect(url_for('ingredients'))
+  return render_template('add_ingredient.html', title="Add an ingredient", form=form)
+
+@app.route('/recipes/add_recipe', methods=['GET', 'POST'])
+@login_required
+def add_recipe():
+  form = EditRecipeForm(recipename="New Recipe")
+  if form.validate_on_submit():
+    recipe = Recipe(
+      name = form.name.data,
+      instructions = form.instructions.data,
+      source = form.source.data,
+      tags = form.tags.data,
+      user_id = current_user.id
+    )
+    db.session.add(recipe)
+    db.session.commit()
+    flash(f'Added {recipe.name}!')
+    return redirect(url_for('recipes'))
+  elif request.method == 'GET':
+    form.name.data = "New Recipe"
+  return render_template('edit_recipe.html', title="Add a recipe", form=form)
