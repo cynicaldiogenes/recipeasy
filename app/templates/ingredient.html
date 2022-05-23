@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>{{ ingredient.name }}</h1>
+  <table><tr>
+    <td>{{ ingredient.calories_per }} calories per</td>
+    <td>{{ ingredient.unit_type }}</td>
+  </tr></table>
+{% endblock %}
