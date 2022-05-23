@@ -60,7 +60,7 @@ class EditRecipeForm(FlaskForm):
   tags = TextAreaField('Tags')
   submit = SubmitField('Save Changes')
 
-  def __init__(self, recipename, *args, **kwargs):
+  def __init__(self, recipename="New Recipe", *args, **kwargs):
     super().__init__(*args, **kwargs)
     self.original_name = recipename
   

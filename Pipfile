@@ -10,6 +10,7 @@ flask-login = "*"
 python-dotenv = "*"
 email-validator = "*"
 flask-migrate = "*"
+flask-bootstrap = "*"
 
 [dev-packages]
 
