@@ -1,34 +1,37 @@
-from app import app, db
+
 from datetime import datetime
-from flask import request, render_template, flash, redirect, url_for
+from flask import request, render_template, flash, redirect, url_for, \
+  current_app
 from flask_login import current_user, login_user, logout_user, login_required
+from app import db
 from app.models import User, Recipe, Ingredient, RecipeIngredient
-from app.forms import LoginForm, RegisterForm, IngredientForm, \
+from app.main.forms import LoginForm, RegisterForm, IngredientForm, \
   EditRecipeForm, RecipeIngredientForm, EditProfileForm, EmptyForm
 from werkzeug.urls import url_parse
+from app.main import bp
 
-@app.before_request
+@bp.before_request
 def before_request():
   if current_user.is_authenticated:
     current_user.last_seen = datetime.utcnow()
     db.session.commit()
 
-@app.route('/')
-@app.route('/index')
+@bp.route('/')
+@bp.route('/index')
 @login_required
 def index():
   return render_template("index.html", title="Home")
 
 
 
-@app.route('/user/<username>')
+@bp.route('/user/<username>')
 @login_required
 def user(username):
   user = User.query.filter_by(username=username).first_or_404()
   recipes = Recipe.query.filter_by(user_id=user.id).all()
   return render_template('user.html', user=user, recipes=recipes)
 
-@app.route('/edit_profile', methods=['GET', 'POST'])
+@bp.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
   form = EditProfileForm(current_user.username)
@@ -42,27 +45,27 @@ def edit_profile():
     form.about_me.data = current_user.about_me
   return render_template('edit_profile.html', title='Edit Profile', form=form)
 
-@app.route('/recipes')
+@bp.route('/recipes')
 def recipes():
   recipes = Recipe.query.all()
   return render_template('recipes.html', title='Recipes', recipes=recipes)
 
-@app.route('/ingredients')
+@bp.route('/ingredients')
 def ingredients():
   ingredients = Ingredient.query.all()
   return render_template('ingredients.html', title="Ingredients", ingredients=ingredients)
 
-@app.route('/recipes/<recipename>')
+@bp.route('/recipes/<recipename>')
 def recipe(recipename):
   recipe = Recipe.query.filter_by(name=recipename).first_or_404()
   return render_template('recipe.html', recipe=recipe, ingredients=ingredients, title=recipename)
 
-@app.route('/ingredients/<ingredientname>', methods=['GET', 'POST'])
+@bp.route('/ingredients/<ingredientname>', methods=['GET', 'POST'])
 def ingredient(ingredientname):
   ingredient = Ingredient.query.filter_by(name=ingredientname).first_or_404()
   return render_template('ingredient.html', title=f'{ingredientname} details', ingredient=ingredient)
 
-@app.route('/recipes/<recipename>/edit_recipe', methods=['GET', 'POST'])
+@bp.route('/recipes/<recipename>/edit_recipe', methods=['GET', 'POST'])
 @login_required
 def edit_recipe(recipename):
   recipe = Recipe.query.filter_by(name=recipename).first_or_404()
@@ -83,7 +86,7 @@ def edit_recipe(recipename):
     
 
 #Update this route to also set quantity when adding to recipe
-@app.route('/recipes/<recipe>/add_recipe_ingredient/<ingredient>', methods=['POST'])
+@bp.route('/recipes/<recipe>/add_recipe_ingredient/<ingredient>', methods=['POST'])
 @login_required
 def add_recipe_ingredient(recipe, ingredient):
   form = EmptyForm()
@@ -102,7 +105,7 @@ def add_recipe_ingredient(recipe, ingredient):
   else:
     return redirect(url_for('index'))
 
-@app.route('/recipes/<recipe>/remove_recipe_ingredient/<ingredient>', methods=['POST'])
+@bp.route('/recipes/<recipe>/remove_recipe_ingredient/<ingredient>', methods=['POST'])
 @login_required
 def remove_recipe_ingredient(recipe, ingredient):
   form = EmptyForm()
@@ -121,7 +124,7 @@ def remove_recipe_ingredient(recipe, ingredient):
   else:
     return redirect(url_for('index'))
 
-@app.route('/ingredients/add_ingredient', methods=['GET', 'POST'])
+@bp.route('/ingredients/add_ingredient', methods=['GET', 'POST'])
 @login_required
 def add_ingredient():
   form = IngredientForm()
@@ -138,7 +141,7 @@ def add_ingredient():
     return redirect(url_for('ingredients'))
   return render_template('add_ingredient.html', title="Add an ingredient", form=form)
 
-@app.route('/recipes/add_recipe', methods=['GET', 'POST'])
+@bp.route('/recipes/add_recipe', methods=['GET', 'POST'])
 @login_required
 def add_recipe():
   form = EditRecipeForm(recipename="New Recipe")
