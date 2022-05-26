@@ -1,3 +1,4 @@
+from app.errors import handlers
 from config import Config
 from flask import Flask
 from flask_bootstrap import Bootstrap
@@ -44,4 +45,4 @@ if not app.debug:
     app.logger.setLevel(logging.INFO)
     app.logger.info('Recipeasy startup')
     
-from app import routes, models, errors
+from app import routes, models
