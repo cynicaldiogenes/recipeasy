@@ -3,6 +3,6 @@
     <td><img src="{{ recipe.author.avatar(36) }}"></td>
     <td>
       {{ recipe.id.username }} has a recipe: 
-      <a href="{{ url_for('recipe', recipename=recipe.name) }}">{{ recipe.name }}</a></td>
+      <a href="{{ url_for('main.recipe', recipename=recipe.name) }}">{{ recipe.name }}</a></td>
   </tr>
 </table>

@@ -5,8 +5,9 @@ from flask import request, render_template, flash, redirect, url_for, \
 from flask_login import current_user, login_user, logout_user, login_required
 from app import db
 from app.models import User, Recipe, Ingredient, RecipeIngredient
-from app.main.forms import LoginForm, RegisterForm, IngredientForm, \
+from app.main.forms import IngredientForm, \
   EditRecipeForm, RecipeIngredientForm, EditProfileForm, EmptyForm
+#from app.auth.forms import LoginForm, RegisterForm
 from werkzeug.urls import url_parse
 from app.main import bp
 
@@ -94,16 +95,16 @@ def add_recipe_ingredient(recipe, ingredient):
     myrecipe = Recipe.query.filter_by(name=recipe).first()
     if myrecipe is None:
       flash(f'Recipe {recipe} not found.')
-      return redirect(url_for('index'))
+      return redirect(url_for('main.index'))
     myingredient = Ingredient.filter_by(name=ingredient).first()
     if myingredient is None:
       flash(f'Ingredient {ingredient} not found.')
     myrecipe.add_ingredient(myingredient)
     db.session.commit()
     flash(f'Added {ingredient} to {recipe}')
-    return redirect(url_for('index'))
+    return redirect(url_for('main.index'))
   else:
-    return redirect(url_for('index'))
+    return redirect(url_for('main.index'))
 
 @bp.route('/recipes/<recipe>/remove_recipe_ingredient/<ingredient>', methods=['POST'])
 @login_required
@@ -113,16 +114,16 @@ def remove_recipe_ingredient(recipe, ingredient):
     myrecipe = Recipe.query.filter_by(name=recipe).first()
     if myrecipe is None:
       flash(f'Recipe {recipe} not found.')
-      return redirect(url_for('index'))
+      return redirect(url_for('main.index'))
     myingredient = Ingredient.filter_by(name=ingredient).first()
     if myingredient is None:
       flash(f'Ingredient {ingredient} not found.')
     myrecipe.remove_ingredient(myingredient)
     db.session.commit()
     flash(f'Removed {ingredient} from {recipe}.')
-    return redirect(url_for('index'))
+    return redirect(url_for('main.index'))
   else:
-    return redirect(url_for('index'))
+    return redirect(url_for('main.index'))
 
 @bp.route('/ingredients/add_ingredient', methods=['GET', 'POST'])
 @login_required
@@ -138,7 +139,7 @@ def add_ingredient():
     db.session.add(ingredient)
     db.session.commit()
     flash(f'Added {ingredient.name}!')
-    return redirect(url_for('ingredients'))
+    return redirect(url_for('main.ingredients'))
   return render_template('add_ingredient.html', title="Add an ingredient", form=form)
 
 @bp.route('/recipes/add_recipe', methods=['GET', 'POST'])
@@ -156,7 +157,7 @@ def add_recipe():
     db.session.add(recipe)
     db.session.commit()
     flash(f'Added {recipe.name}!')
-    return redirect(url_for('recipes'))
+    return redirect(url_for('main.recipes'))
   elif request.method == 'GET':
     form.name.data = "New Recipe"
   return render_template('edit_recipe.html', title="Add a recipe", form=form)
