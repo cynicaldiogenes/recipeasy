@@ -72,4 +72,6 @@ class RecipeModelCase(unittest.TestCase):
     self.assertTrue(r.is_ingredient(i2))
 
 if __name__ == '__main__':
-  unittest.main(verbosity=2)
+  import xmlrunner
+  
+  unittest.main(testRunner=xmlrunner.XMLTestRunner(output='test_reports'))
